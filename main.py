@@ -12,15 +12,19 @@ def main():
     # open the file for writing
     fd = None
     if not args.file is None:
-        fd = open(args.file, "w")
+        fd = open(args.file, "w", buffering=1, encoding="ascii")
     
     # open the serial port
-    ser = serial.Serial(args.port, args.baud)
+    ser = serial.Serial(port=args.port, baudrate=args.baud, timeout=0.250)
 
     # endless loop for logging
     while True:
         # read from the serial port
         line = ser.readline().decode("ascii").rstrip("\n\r")
+
+        # skip empty lines
+        if len(line) == 0:
+            continue
 
         # write to standard output
         print(line)
@@ -28,8 +32,6 @@ def main():
         # write to the file if available
         if not fd is None:
             fd.write(line + "\n")
-            fd.flush()
-
 
 if __name__ == "__main__":
     main()
